@@ -512,7 +512,13 @@ function flameGraph (opts) {
     context.rect(x, y, width, c)
     context.clip()
     context.font = `${labelFontSize}px ${FONT_FAMILY}`
-    context.fillStyle = labelColors[node.data.type] || labelColors.default
+
+    var fadeWidth = Math.min(width, 24)
+    var fadeStart = x + width - fadeWidth
+    var gradient = context.createLinearGradient(fadeStart, y, fadeStart + fadeWidth, y)
+    gradient.addColorStop(0, labelColors[node.data.type] || labelColors.default)
+    gradient.addColorStop(1, 'transparent')
+    context.fillStyle = gradient
 
     var labelOffset = 4 // padding
     // Center the "all stacks" text
