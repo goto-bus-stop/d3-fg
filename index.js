@@ -516,8 +516,10 @@ function flameGraph (opts) {
     var fadeWidth = Math.min(width, 24)
     var fadeStart = x + width - fadeWidth
     var gradient = context.createLinearGradient(fadeStart, y, fadeStart + fadeWidth, y)
-    gradient.addColorStop(0, labelColors[node.data.type] || labelColors.default)
-    gradient.addColorStop(1, 'transparent')
+    var labelColor = labelColors[node.data.type] || labelColors.default
+    var transparentColor = getTransparentColor(labelColor)
+    gradient.addColorStop(0, labelColor)
+    gradient.addColorStop(1, transparentColor)
     context.fillStyle = gradient
 
     var labelOffset = 4 // padding
@@ -982,6 +984,29 @@ function createAnimation (opts, render, done) {
 
 function interpolate (start, end, ease) {
   return start + ease * (end - start)
+}
+
+function getTransparentColor () {
+  // rgba(255, 255, 255, 0.7) → rgba(255, 255, 255, 0.0)
+  if (labelColor.startsWith('rgba(')) {
+    return labelColor.replace(/(\d+)\)$/, '0.0)')
+  }
+
+  // rgb(255, 255, 255) → rgba(255, 255, 255, 0.0)
+  if (labelColor.startsWith('rgb(')) {
+    return labelColor.replace('rgb(', 'rgba(').replace(/\)$/, ', 0.0)')
+  }
+
+  // #FFFFFF | #FFF → rgba(255, 255, 255, 0.0)
+  if (labelColor.startsWith('#')) {
+    const parts = labelColor.match(/^#(..)(..)(..)$/) || labelColor.match(/^#(.)(.)(.)$/)
+    if (parts) {
+      return  `rgba(${parts.slice(1).map(n => parseInt(n, 16)).join(', ')}, 0.0)`
+    }
+  }
+
+  // Transparent black fallback
+  return 'transparent'
 }
 
 module.exports = flameGraph
