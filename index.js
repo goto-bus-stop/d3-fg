@@ -49,6 +49,7 @@ function flameGraph (opts) {
   h += opts.topOffset || 0
   var w = opts.width || document.body.clientWidth * 0.89 // graph width
   var heatBars = opts.heatBars || false
+  var fadeOverflow = opts.fadeOverflow || false
   var labelColors = opts.labelColors || { default: '#000' }
   var frameColors = opts.frameColors || { fill: '#fff', stroke: 'rgba(0, 0, 0, 0.7)' }
   var scaleToWidth = null
@@ -513,14 +514,19 @@ function flameGraph (opts) {
     context.clip()
     context.font = `${labelFontSize}px ${FONT_FAMILY}`
 
-    var fadeWidth = Math.min(width, 24)
-    var fadeStart = x + width - fadeWidth
-    var gradient = context.createLinearGradient(fadeStart, y, fadeStart + fadeWidth, y)
     var labelColor = labelColors[node.data.type] || labelColors.default
-    var transparentColor = getTransparentColor(labelColor)
-    gradient.addColorStop(0, labelColor)
-    gradient.addColorStop(1, transparentColor)
-    context.fillStyle = gradient
+    if (fadeOverflow) {
+      var fadeWidth = Math.min(width, 24)
+      var gradient = context.createLinearGradient(
+        x + width - fadeWidth, y,
+        x + width, y
+      )
+      gradient.addColorStop(0, labelColor)
+      gradient.addColorStop(1, getTransparentColor(labelColor))
+      context.fillStyle = gradient
+    } else {
+      context.fillStyle = labelColor
+    }
 
     var labelOffset = 4 // padding
     // Center the "all stacks" text

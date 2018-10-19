@@ -53,6 +53,8 @@ require('d3-flamegraph')({
     stackTop(d)      // Returns number representing time in this frame not in any non-hidden child frames
     return           // String, expects valid rgb, rgba or hash string
   },
+  fadeOverflow, // Boolean, when true, fade out stack frame text that would otherwise overflow the edge
+                // of the frame.
   heatBars, // Boolean, when false (the default), heat is visualized as the background colour of stack frames;
             // when true, heat is visualized by a bar drawn on _top_ of stack frames
   frameColors: { // Object, colors for the stack frame boxes.
